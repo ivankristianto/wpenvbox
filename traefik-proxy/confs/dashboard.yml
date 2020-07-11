@@ -1,0 +1,16 @@
+http:
+  routers:
+    dashboard:
+      rule: Host(`traefik.localhost`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      service: api@internal
+      tls: {}
+      middlewares:
+        - auth
+  middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
+    auth:
+      basicAuth:
+        usersFile: "~/.wpenvusers"

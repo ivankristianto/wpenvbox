@@ -1,0 +1,32 @@
+# traefik.yml
+
+api:
+  # Dashboard
+  #
+  # Optional
+  # Default: true
+  #
+  dashboard: true
+  insecure: false
+  debug: false
+
+providers:
+  docker:
+    network: proxy
+  file:
+    directory: /etc/traefik/confs
+
+entryPoints:
+  http:
+    address: ":80"
+  https:
+    address: ":443"
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ssl@wpenvbox.com
+      storage: acme.json
+      httpChallenge:
+        # used during the challenge
+        entryPoint: http
