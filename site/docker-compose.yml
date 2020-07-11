@@ -1,0 +1,26 @@
+version: '3.7'
+
+networks:
+  proxy:
+    external:
+      name: proxy
+
+services:
+  mainsite:
+    image: nginx:alpine
+    container_name: mainsite
+    restart: always
+    env_file:
+      - ../.env
+    labels:
+      - "traefik.http.routers.mainsite.entrypoints=http"
+      - "traefik.http.routers.mainsite.middlewares=redirect-to-https@docker"
+      - "traefik.http.routers.mainsite.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.mainsite-secure.entrypoints=https"
+      - "traefik.http.routers.mainsite-secure.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.mainsite-secure.tls=true"
+      - "traefik.http.routers.mainsite-secure.tls.certresolver=letsencrypt"
+    networks:
+        - proxy
+    volumes:
+      - ./www:/usr/share/nginx/html:ro
