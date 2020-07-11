@@ -3,7 +3,8 @@ http:
     dashboard:
       rule: Host(`{{ env "APIURL" }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
-      tls: {}
+      tls:
+        certResolver: letsencrypt
       middlewares:
         - auth
   middlewares:
