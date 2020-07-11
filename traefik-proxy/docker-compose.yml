@@ -9,6 +9,8 @@ services:
     container_name: proxy
     image: traefik:v2.2
     restart: always
+    env_file:
+      - .env
     ports:
       # The HTTP port
       - "80:80"
@@ -22,5 +24,6 @@ services:
       - ./acme.json:/acme.json
       - ./confs:/etc/traefik/confs
       - ./traefik.yml:/etc/traefik/traefik.yml
+      - ./.wpenvusers:/etc/traefik/.wpenvusers
     networks:
       - proxy

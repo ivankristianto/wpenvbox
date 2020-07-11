@@ -1,7 +1,7 @@
 http:
   routers:
     dashboard:
-      rule: Host(`traefik.localhost`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
+      rule: Host(`{{ env "APIURL" }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
       tls: {}
       middlewares:
@@ -13,4 +13,4 @@ http:
         permanent: true
     auth:
       basicAuth:
-        usersFile: "~/.wpenvusers"
+        usersFile: "/etc/traefik/.wpenvusers"

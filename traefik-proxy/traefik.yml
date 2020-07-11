@@ -10,6 +10,15 @@ api:
   insecure: false
   debug: false
 
+ping: {}
+
+log:
+  filePath: "/var/log/traefik.log"
+
+accessLog:
+  filePath: "/var/log/access.log"
+  bufferingSize: 100
+
 providers:
   docker:
     network: proxy
