@@ -12,6 +12,10 @@ class Config {
 		return path.join(os.homedir(), '.wpenvbox.env');
 	}
 
+	static getUserFile() {
+		return path.join(os.homedir(), '.wpenvbox.user');
+	}
+
 	static defaultConfig() {
 		return {
 			apiUrl: '',
@@ -29,16 +33,6 @@ class Config {
 			const exportString = `${key.toUpperCase()}=${value}\n`;
 			stream.write(exportString);
 		}
-	}
-
-	static async read() {
-		let readConfig = {};
-
-		if (await fs.exists(Config.getConfigFile())) {
-			readConfig = await fs.readJson(Config.getConfigFile());
-		}
-
-		return { ...readConfig };
 	}
 }
 

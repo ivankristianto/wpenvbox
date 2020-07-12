@@ -27,6 +27,6 @@ services:
       - ./acme.json:/acme.json
       - ./confs:/etc/traefik/confs
       - ./traefik.yml:/etc/traefik/traefik.yml
-      - ./.wpenvusers:/etc/traefik/.wpenvusers
+      - ~/.wpenvbox.user:/etc/traefik/.wpenvusers
     networks:
       - proxy
