@@ -28,10 +28,6 @@ providers:
 entryPoints:
   http:
     address: ":80"
-    redirect-to-https:
-      redirectScheme:
-        scheme: https
-        permanent: true
   https:
     address: ":443"
 

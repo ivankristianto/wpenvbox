@@ -18,6 +18,9 @@ services:
       - "443:443"
       # The Web UI (enabled by --api.insecure=true)
       # - "8080:8080"
+    labels:
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.permanent=true"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock

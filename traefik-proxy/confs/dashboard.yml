@@ -8,6 +8,10 @@ http:
       middlewares:
         - auth
   middlewares:
+    redirect-to-https:
+      redirectScheme:
+        scheme: https
+        permanent: true
     auth:
       basicAuth:
         usersFile: "/etc/traefik/.wpenvusers"
