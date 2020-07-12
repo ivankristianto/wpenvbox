@@ -45,6 +45,7 @@ lib
 # Environment files
 .env
 .wpenvusers
+acme.json
 
 # My backup files
 backup*
