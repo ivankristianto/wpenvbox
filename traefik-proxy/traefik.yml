@@ -1,11 +1,6 @@
 # traefik.yml
 
 api:
-  # Dashboard
-  #
-  # Optional
-  # Default: true
-  #
   dashboard: true
   insecure: false
   debug: false
