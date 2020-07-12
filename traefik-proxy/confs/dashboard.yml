@@ -6,6 +6,7 @@ http:
       tls:
         certResolver: letsencrypt
       middlewares:
+        - redirect-to-https
         - auth
   middlewares:
     redirect-to-https:

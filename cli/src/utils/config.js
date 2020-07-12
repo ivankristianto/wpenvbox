@@ -1,21 +1,34 @@
 import os from 'os';
 import path from 'path';
 import fs from 'fs-extra';
-import log from './logger';
+import dotenv from 'dotenv';
 
 class Config {
+	static loadEnv() {
+		dotenv.config({ path: Config.getConfigFile() });
+	}
+
 	static getConfigFile() {
-		return path.join(os.homedir(), '.cloudflare-config');
+		return path.join(os.homedir(), '.wpenvbox.env');
 	}
 
 	static defaultConfig() {
 		return {
-			apiToken: '',
+			apiUrl: '',
+			domain: '',
+			defaultEmail: 'ssl@wpenvbox.com',
+			proxyPath: '/Users/ivankristianto/Works/wpenvbox/traefik-proxy',
+			wpEnvPort: 80,
 		};
 	}
 
 	static async write(config) {
-		await fs.writeJson(Config.getConfigFile(), config);
+		const stream = fs.createWriteStream(Config.getConfigFile());
+
+		for (const [key, value] of Object.entries(config)) {
+			const exportString = `${key.toUpperCase()}=${value}\n`;
+			stream.write(exportString);
+		}
 	}
 
 	static async read() {
@@ -26,32 +39,6 @@ class Config {
 		}
 
 		return { ...readConfig };
-	}
-
-	static async get(key) {
-		const defaults = Config.defaultConfig();
-		const config = await Config.read();
-
-		return typeof config[key] === 'undefined' ? defaults[key] : config[key];
-	}
-
-	static async set(key, value) {
-		const config = await Config.read();
-
-		config[key] = value;
-
-		await Config.write(config);
-	}
-
-	static async getAuthToken() {
-		const token = await Config.get('apiToken');
-
-		if (!token) {
-			log.warning('Please run cf config setup');
-			return false;
-		}
-
-		return token;
 	}
 }
 

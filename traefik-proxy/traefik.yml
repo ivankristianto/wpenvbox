@@ -29,7 +29,7 @@ entryPoints:
 certificatesResolvers:
   letsencrypt:
     acme:
-      email: ssl@wpenvbox.com
+      email: "{{ env \"DEFAULTEMAIL\" }}"
       storage: acme.json
       httpChallenge:
         # used during the challenge

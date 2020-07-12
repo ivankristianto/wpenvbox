@@ -3,10 +3,12 @@
  */
 import yargs from 'yargs';
 import log from './utils/logger';
+import Config from './utils/config';
 
 // eslint-disable-next-line consistent-return
 function main() {
 	try {
+		Config.loadEnv();
 		return yargs
 			.commandDir('commands')
 			.demandCommand()
