@@ -1,4 +1,4 @@
-import { run } from 'docker-compose';
+import { down, run } from 'docker-compose';
 
 class WordPress {
 	static async updateSiteUrl(config) {
@@ -13,6 +13,13 @@ class WordPress {
 			['wp', 'search-replace', 'http://localhost:80', `https://${config.host}`],
 			options,
 		);
+	}
+
+	static async stop(config) {
+		await down({
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		});
 	}
 }
 
