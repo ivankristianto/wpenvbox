@@ -1,6 +1,6 @@
 import log from '../utils/logger';
 
-exports.command = 'proxy';
+exports.command = 'app';
 exports.desc = 'Command to manage applications';
 exports.builder = function (yargs) {
 	return yargs.commandDir('app_cmd');
