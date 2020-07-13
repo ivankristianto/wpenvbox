@@ -8,7 +8,13 @@ import log from '../../utils/logger';
 
 exports.command = 'create';
 exports.desc = 'Create new wp-env box';
-exports.builder = {};
+exports.builder = {
+	debug: {
+		default: false,
+		describe: 'Show debug process',
+		type: 'boolean',
+	},
+};
 exports.handler = async function (argv) {
 	try {
 		const { debug = true } = argv;
@@ -34,6 +40,7 @@ exports.handler = async function (argv) {
 			MYSQL_RANDOM_ROOT_PASSWORD: '1',
 		};
 		dockerComposeConfig.services.mysql.command = '--innodb-use-native-aio=0';
+		dockerComposeConfig.services.mysql.labels = [`traefik.enable=false`];
 		delete dockerComposeConfig.services.mysql.ports;
 
 		// Modified wordpress configurations.
@@ -93,7 +100,7 @@ exports.handler = async function (argv) {
 			spinner.start();
 		}
 
-		spinner.succeed(`Config created`);
+		spinner.succeed(`Config created in ${config.dockerComposeConfigPath}`);
 	} catch (err) {
 		log.error(err);
 	}
