@@ -1,4 +1,5 @@
 import { restartAll } from 'docker-compose';
+import Config from '../../classes/config';
 import log from '../../utils/logger';
 
 exports.command = 'restart';
@@ -7,7 +8,7 @@ exports.builder = {};
 exports.handler = async function () {
 	try {
 		await restartAll({
-			config: `${process.env.PROXYPATH}/docker-compose.yml`,
+			config: `${Config.getProxyPath()}/docker-compose.yml`,
 			log: true,
 		});
 	} catch (err) {

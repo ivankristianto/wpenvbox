@@ -10,7 +10,7 @@ services:
     image: traefik:v2.2
     restart: always
     env_file:
-      - ~/.wpenvbox.env
+      - ~/.wpenvbox/env
     ports:
       # The HTTP port
       - "80:80"
@@ -27,6 +27,6 @@ services:
       - ./acme.json:/acme.json
       - ./confs:/etc/traefik/confs
       - ./traefik.yml:/etc/traefik/traefik.yml
-      - ~/.wpenvbox.user:/etc/traefik/.wpenvusers
+      - ~/.wpenvbox/user:/etc/traefik/.wpenvusers
     networks:
       - proxy

@@ -61,7 +61,8 @@ exports.handler = async function () {
 	await User.init(userAnswers.user, userAnswers.password);
 	log.success(`Write htpasswd auth to file ${Config.getUserFile()}\n`);
 
-	// 3. Ask for user and input password, run htpasswd to .wpenvusers
+	const proxyPath =
+
 	// 4. Create docker network: proxy
 	// 5. Clone traefik repo
 	// 6. Add traefik docker-compose.yml path to env

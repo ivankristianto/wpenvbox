@@ -1,4 +1,5 @@
 import { ps } from 'docker-compose';
+import Config from '../../classes/config';
 import log from '../../utils/logger';
 
 exports.command = 'ps';
@@ -7,7 +8,7 @@ exports.builder = {};
 exports.handler = async function () {
 	try {
 		const response = await ps({
-			config: `${process.env.PROXYPATH}/docker-compose.yml`,
+			config: `${Config.getProxyPath()}/docker-compose.yml`,
 		});
 		log.info(response.out);
 	} catch (err) {

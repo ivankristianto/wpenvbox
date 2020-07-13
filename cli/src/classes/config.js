@@ -9,11 +9,15 @@ class Config {
 	}
 
 	static getConfigFile() {
-		return path.join(os.homedir(), '.wpenvbox.env');
+		return path.join(os.homedir(), '.wpenvbox/env');
 	}
 
 	static getUserFile() {
-		return path.join(os.homedir(), '.wpenvbox.user');
+		return path.join(os.homedir(), '.wpenvbox/user');
+	}
+
+	static getProxyPath() {
+		return path.join(os.homedir(), '.wpenvbox/proxy');
 	}
 
 	static defaultConfig() {
@@ -21,7 +25,6 @@ class Config {
 			apiUrl: '',
 			domain: '',
 			defaultEmail: 'ssl@wpenvbox.com',
-			proxyPath: '/Users/ivankristianto/Works/wpenvbox/traefik-proxy',
 			wpEnvPort: 80,
 		};
 	}
