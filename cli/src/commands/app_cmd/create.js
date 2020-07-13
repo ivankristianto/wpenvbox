@@ -17,11 +17,13 @@ exports.builder = {
 };
 exports.handler = async function (argv) {
 	try {
-		const { debug = true } = argv;
+		const { debug } = argv;
 		const spinner = ora().start();
 		const configPath = path.resolve('.wp-env.json');
 
 		const config = await readConfig(configPath);
+
+		await fs.mkdir(config.workDirectoryPath, { recursive: true });
 
 		config.port = process.env.WPENVPORT;
 
