@@ -1,7 +1,8 @@
 import inquirer from 'inquirer';
-import { execSync } from 'child_process';
-import Config from '../utils/config';
+import Config from '../classes/config';
+import User from '../classes/user';
 import { validateNotEmpty } from '../utils/promp-validators';
+import log from '../utils/logger';
 
 exports.command = 'init';
 exports.desc = 'Init config and environment';
@@ -38,7 +39,7 @@ exports.handler = async function () {
 	const config = Object.assign(defaults, answers);
 
 	await Config.write(config);
-	console.log(`Write env file to ${Config.getConfigFile()}\n`);
+	log.success(`Write env file to ${Config.getConfigFile()}\n`);
 
 	const users = [
 		{
@@ -57,11 +58,8 @@ exports.handler = async function () {
 
 	const userAnswers = await inquirer.prompt(users);
 
-	await execSync(
-		`htpasswd -b -c ${Config.getUserFile()} ${userAnswers.user} ${userAnswers.password}`,
-	);
-
-	console.log(`Write htpasswd auth to file ${Config.getUserFile()}\n`);
+	await User.init(userAnswers.user, userAnswers.password);
+	log.success(`Write htpasswd auth to file ${Config.getUserFile()}\n`);
 
 	// 3. Ask for user and input password, run htpasswd to .wpenvusers
 	// 4. Create docker network: proxy

@@ -3,7 +3,7 @@
  */
 import yargs from 'yargs';
 import log from './utils/logger';
-import Config from './utils/config';
+import Config from './classes/config';
 
 // eslint-disable-next-line consistent-return
 function main() {
