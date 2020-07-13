@@ -13,7 +13,7 @@ exports.command = 'destroy';
 exports.desc = 'Destroy wp-env box services';
 exports.builder = {
 	debug: {
-		default: true,
+		default: false,
 		describe: 'Show debug process',
 		type: 'boolean',
 	},

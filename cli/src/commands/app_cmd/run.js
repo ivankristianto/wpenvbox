@@ -3,10 +3,11 @@ import { run } from 'docker-compose';
 import path from 'path';
 import { readConfig } from '@wordpress/env/lib/config';
 
-exports.command = 'run [command..]';
+exports.command = 'run <container> [command..]';
 exports.desc = 'Run cli command to wp-env box services';
 exports.builder = {};
 exports.handler = async function (argv) {
+	const { container } = argv;
 	let { command } = argv;
 	const spinner = ora().start();
 	const configPath = path.resolve('.wp-env.json');
@@ -15,7 +16,6 @@ exports.handler = async function (argv) {
 		const config = await readConfig(configPath);
 
 		command = command.join(' ');
-		const container = 'cli';
 
 		spinner.text = `Running \`${command}\` in '${container}'.`;
 
@@ -25,7 +25,7 @@ exports.handler = async function (argv) {
 			log: config.debug,
 		};
 
-		const response = await run('cli', command.split(' '), options);
+		const response = await run(container, command.split(' '), options);
 
 		spinner.info(`Response: ${response.out}`);
 		spinner.succeed(`Ran \`${command}\` in '${container}'.`);

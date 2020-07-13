@@ -24,7 +24,7 @@ exports.command = 'start';
 exports.desc = 'Start wp-env box services';
 exports.builder = {
 	debug: {
-		default: true,
+		default: false,
 		describe: 'Show debug process',
 		type: 'boolean',
 	},

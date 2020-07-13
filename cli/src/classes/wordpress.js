@@ -14,13 +14,6 @@ class WordPress {
 			options,
 		);
 	}
-
-	static async stop(config) {
-		await down({
-			config: config.dockerComposeConfigPath,
-			log: config.debug,
-		});
-	}
 }
 
 export default WordPress;

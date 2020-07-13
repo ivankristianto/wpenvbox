@@ -1,13 +1,13 @@
 import ora from 'ora';
 import path from 'path';
 import { readConfig } from '@wordpress/env/lib/config';
-import WordPress from '../../classes/wordpress';
+import { down } from 'docker-compose';
 
 exports.command = 'stop';
 exports.desc = 'Stop wp-env box services';
 exports.builder = {
 	debug: {
-		default: true,
+		default: false,
 		describe: 'Show debug process',
 		type: 'boolean',
 	},
@@ -24,7 +24,10 @@ exports.handler = async function (argv) {
 	config.basename = config.workDirectoryPath.split('/').pop();
 	config.host = `${config.basename}.${process.env.DOMAIN}`;
 
-	await WordPress.stop(config);
+	await down({
+		config: config.dockerComposeConfigPath,
+		log: config.debug,
+	});
 
 	spinner.succeed(`Stopped wp-env box.`);
 };

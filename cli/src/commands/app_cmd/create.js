@@ -83,7 +83,6 @@ exports.handler = async function (argv) {
 		// @TODO: Revisit this later
 		// For now removing things we don't need
 		delete dockerComposeConfig.services.phpunit;
-		delete dockerComposeConfig.services.composer;
 		delete dockerComposeConfig.services['tests-cli'];
 		delete dockerComposeConfig.services['tests-wordpress'];
 		delete dockerComposeConfig.volumes['tests-wordpress'];
