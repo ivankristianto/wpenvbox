@@ -1,4 +1,6 @@
 import inquirer from 'inquirer';
+import { mkdir, exec, rm } from 'shelljs';
+import fs from 'fs-extra';
 import Config from '../classes/config';
 import User from '../classes/user';
 import { validateNotEmpty } from '../utils/promp-validators';
@@ -8,6 +10,9 @@ exports.command = 'init';
 exports.desc = 'Init config and environment';
 exports.builder = {};
 exports.handler = async function () {
+	log.info('Creating directory ~/.wpenvbox');
+	mkdir('-p', Config.getDirPath());
+
 	const defaults = Config.defaultConfig();
 
 	const questions = [
@@ -61,9 +66,18 @@ exports.handler = async function () {
 	await User.init(userAnswers.user, userAnswers.password);
 	log.success(`Write htpasswd auth to file ${Config.getUserFile()}\n`);
 
-	const proxyPath =
+	log.info(`Clone wpenvbox/proxy to ${Config.getProxyPath()}`);
+	if (await fs.pathExists(Config.getProxyPath())) {
+		log.info(`${Config.getProxyPath()} exist, deleting the folder`);
+		rm('-rf', Config.getProxyPath());
+	}
+	exec(`git clone ${Config.getProxyGit()} ${Config.getProxyPath()}`);
 
-	// 4. Create docker network: proxy
-	// 5. Clone traefik repo
-	// 6. Add traefik docker-compose.yml path to env
+	log.info(`Create acme.json file in ${Config.getProxyPath()} and make permission to 600`);
+	exec(
+		`touch ${Config.getProxyPath()}/acme.json && chmod 600 ${Config.getProxyPath()}/acme.json`,
+	);
+
+	log.info(`Create docker network: proxy`);
+	exec(`docker network create proxy`);
 };

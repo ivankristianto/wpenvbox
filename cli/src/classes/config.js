@@ -8,6 +8,10 @@ class Config {
 		dotenv.config({ path: Config.getConfigFile() });
 	}
 
+	static getDirPath() {
+		return path.join(os.homedir(), '.wpenvbox');
+	}
+
 	static getConfigFile() {
 		return path.join(os.homedir(), '.wpenvbox/env');
 	}
@@ -18,6 +22,10 @@ class Config {
 
 	static getProxyPath() {
 		return path.join(os.homedir(), '.wpenvbox/proxy');
+	}
+
+	static getProxyGit() {
+		return 'https://github.com/ivankristianto/wpenvbox-proxy.git';
 	}
 
 	static defaultConfig() {
