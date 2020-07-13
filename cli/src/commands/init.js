@@ -1,5 +1,5 @@
 import inquirer from 'inquirer';
-import { mkdir, exec, rm } from 'shelljs';
+import { mkdir, exec, rm, sed } from 'shelljs';
 import fs from 'fs-extra';
 import Config from '../classes/config';
 import User from '../classes/user';
@@ -77,6 +77,11 @@ exports.handler = async function () {
 	exec(
 		`touch ${Config.getProxyPath()}/acme.json && chmod 600 ${Config.getProxyPath()}/acme.json`,
 	);
+
+	log.info(
+		`Update proxy/traefik.yml file in ${Config.getProxyPath()} and make permission to 600`,
+	);
+	sed('-i', '{{DEFAULTEMAIL}}', answers.defaultEmail, `${Config.getProxyPath()}/traefik.yml`);
 
 	log.info(`Create docker network: proxy`);
 	exec(`docker network create proxy`);
