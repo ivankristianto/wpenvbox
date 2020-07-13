@@ -11,7 +11,7 @@ services:
     container_name: mainsite
     restart: always
     env_file:
-      - ../.env
+      - ~/.wpenvbox/env
     labels:
       - "traefik.http.routers.mainsite.entrypoints=http"
       - "traefik.http.routers.mainsite.middlewares=redirect-to-https@docker"
