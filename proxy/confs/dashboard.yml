@@ -3,6 +3,9 @@ http:
     dashboard:
       rule: Host(`{{ env "APIURL" }}`) && (PathPrefix(`/api`) || PathPrefix(`/dashboard`))
       service: api@internal
+      entryPoints:
+        - http
+        - https
       tls:
         certResolver: letsencrypt
       middlewares:
