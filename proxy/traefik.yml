@@ -25,6 +25,8 @@ entryPoints:
     address: ":80"
   https:
     address: ":443"
+  codeserver:
+    address: ":8888"
 
 certificatesResolvers:
   letsencrypt:

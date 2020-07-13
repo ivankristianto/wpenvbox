@@ -16,6 +16,8 @@ services:
       - "80:80"
       # The HTTPS port
       - "443:443"
+      # Code server port
+      - "8888:8888"
       # The Web UI (enabled by --api.insecure=true)
       # - "8080:8080"
     labels:
