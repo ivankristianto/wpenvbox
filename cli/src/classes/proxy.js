@@ -1,7 +1,66 @@
 import { down, logs, ps, restartAll, run, upAll } from 'docker-compose';
+import { exec, mkdir, rm, sed } from 'shelljs';
+import inquirer from 'inquirer';
+import fs from 'fs-extra';
+import User from './user';
 import Config from './config';
+import log from '../utils/logger';
 
 class Proxy {
+	/**
+	 * Init wpenvbox environments
+	 *
+	 * @param {object} options Options object
+	 * @param {object} options.spinner A CLI spinner which indicates progress.
+	 * @returns {Promise<void>}
+	 */
+	static async init({ spinner }) {
+		spinner.info('Creating directory ~/.wpenvbox');
+		mkdir('-p', Config.getDirPath());
+
+		// Inquire users for the configurations.
+		spinner.text = 'Creating default config file.';
+		const defaults = Config.defaultConfig();
+		const answers = await inquirer.prompt(Config.getConfigQuestions());
+		const config = Object.assign(defaults, answers);
+		await Config.write(config);
+
+		spinner.info(`Wrote configs to file ${Config.getConfigFile()}\n`);
+
+		spinner.text = 'Creating user auth file.';
+		const userAnswers = await inquirer.prompt(User.getUserInquireQuestions());
+		await User.init({ spinner, user: userAnswers.user, password: userAnswers.password });
+		spinner.info(`Wrote user auth to file ${Config.getUserFile()}\n`);
+
+		spinner.start();
+
+		spinner.text = 'Creating proxy server.';
+		spinner.info(`Clone wpenvbox/proxy to ${Config.getProxyPath()}`);
+		if (await fs.pathExists(Config.getProxyPath())) {
+			log.info(`${Config.getProxyPath()} exist, deleting the folder`);
+			rm('-rf', Config.getProxyPath());
+		}
+		spinner.start();
+		exec(`git clone ${Config.getProxyGit()} ${Config.getProxyPath()}`);
+
+		spinner.info(
+			`Create acme.json file in ${Config.getProxyPath()} and make permission to 600`,
+		);
+		exec(
+			`touch ${Config.getProxyPath()}/acme.json && chmod 600 ${Config.getProxyPath()}/acme.json`,
+		);
+
+		spinner.info(
+			`Update proxy/traefik.yml file in ${Config.getProxyPath()} and make permission to 600`,
+		);
+		sed('-i', '{{DEFAULTEMAIL}}', answers.defaultEmail, `${Config.getProxyPath()}/traefik.yml`);
+
+		spinner.info(`Create docker network: proxy`);
+		exec(`docker network create proxy`);
+
+		spinner.text = 'Done!';
+	}
+
 	/**
 	 *
 	 * See Proxy Server logs

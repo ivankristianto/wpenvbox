@@ -38,11 +38,10 @@ const withSpinner = (command) => (...args) => {
 				// Error is an unknown error. That means there was a bug in our code.
 				spinner.fail(typeof error === 'string' ? error : error.message);
 				// Disable reason: Using console.error() means we get a stack trace.
-				// eslint-disable-next-line no-console
 				console.error(error);
 				process.exit(1);
 			} else {
-				spinner.fail(error.message);
+				spinner.fail('An unknown error occured.');
 				process.exit(1);
 			}
 		},

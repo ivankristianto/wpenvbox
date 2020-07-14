@@ -2,6 +2,7 @@ import os from 'os';
 import path from 'path';
 import fs from 'fs-extra';
 import dotenv from 'dotenv';
+import { validateNotEmpty } from '../utils/promp-validators';
 
 class Config {
 	static loadEnv() {
@@ -35,6 +36,32 @@ class Config {
 			defaultEmail: 'ssl@wpenvbox.com',
 			wpEnvPort: 80,
 		};
+	}
+
+	static getConfigQuestions() {
+		return [
+			{
+				name: 'apiUrl',
+				type: 'input',
+				message: 'What is the url for the proxy dashboard and api: ',
+				default: process.env.APIURL,
+				validate: validateNotEmpty,
+			},
+			{
+				name: 'domain',
+				type: 'input',
+				message: 'What is the main domain: ',
+				default: process.env.DOMAIN,
+				validate: validateNotEmpty,
+			},
+			{
+				name: 'defaultEmail',
+				type: 'input',
+				message: 'Default email address for notification and letsencrypt: ',
+				default: process.env.DEFAULTEMAIL,
+				validate: validateNotEmpty,
+			},
+		];
 	}
 
 	static async write(config) {
