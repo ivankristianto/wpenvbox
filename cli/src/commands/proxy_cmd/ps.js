@@ -1,17 +1,7 @@
-import { ps } from 'docker-compose';
-import Config from '../../classes/config';
-import log from '../../utils/logger';
+import Proxy from '../../classes/proxy';
+import withSpinner from '../../utils/withSpinner';
 
 exports.command = 'ps';
-exports.desc = 'See proxy server process list';
+exports.desc = 'See current docker process list';
 exports.builder = {};
-exports.handler = async function () {
-	try {
-		const response = await ps({
-			config: `${Config.getProxyPath()}/docker-compose.yml`,
-		});
-		log.info(response.out);
-	} catch (err) {
-		log.error(err);
-	}
-};
+exports.handler = withSpinner(Proxy.ps);
