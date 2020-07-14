@@ -4,7 +4,6 @@ import inquirer from 'inquirer';
 import fs from 'fs-extra';
 import User from './user';
 import Config from './config';
-import log from '../utils/logger';
 
 class Proxy {
 	/**
@@ -37,7 +36,7 @@ class Proxy {
 		spinner.text = 'Creating proxy server.';
 		spinner.info(`Clone wpenvbox/proxy to ${Config.getProxyPath()}`);
 		if (await fs.pathExists(Config.getProxyPath())) {
-			log.info(`${Config.getProxyPath()} exist, deleting the folder`);
+			spinner.info(`${Config.getProxyPath()} exist, deleting the folder`);
 			rm('-rf', Config.getProxyPath());
 		}
 		spinner.start();
@@ -62,7 +61,6 @@ class Proxy {
 	}
 
 	/**
-	 *
 	 * See Proxy Server logs
 	 *
 	 * @param {object}  options Options object
@@ -80,7 +78,6 @@ class Proxy {
 	}
 
 	/**
-	 *
 	 * See Docker Processlist
 	 *
 	 * @param {object}  options Options object
@@ -97,7 +94,6 @@ class Proxy {
 	}
 
 	/**
-	 *
 	 * Restart Proxy Server
 	 *
 	 * @param {object}  options Options object
@@ -116,7 +112,6 @@ class Proxy {
 	}
 
 	/**
-	 *
 	 * Restart Proxy Server
 	 *
 	 * @param {object}  options Options object
@@ -133,7 +128,6 @@ class Proxy {
 	}
 
 	/**
-	 *
 	 * Start Proxy Server
 	 *
 	 * @param {object}  options Options object
@@ -150,7 +144,6 @@ class Proxy {
 	}
 
 	/**
-	 *
 	 * Stop Proxy Server
 	 *
 	 * @param {object}  options Options object
