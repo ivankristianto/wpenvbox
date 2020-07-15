@@ -115,7 +115,7 @@ class App {
 		// Add code server
 		dockerComposeConfig.services.codeserver = {
 			depends_on: ['wordpress'],
-			image: 'codercom/code-server',
+			image: 'ivankristianto/code-server:latest',
 			labels: [
 				`traefik.http.routers.${config.basename}-code-secure.entrypoints=codeserver`,
 				`traefik.http.routers.${config.basename}-code-secure.rule=Host(\`${config.host}\`)`,
