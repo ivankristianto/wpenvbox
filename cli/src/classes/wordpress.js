@@ -1,4 +1,4 @@
-import { down, run } from 'docker-compose';
+import { run } from 'docker-compose';
 
 class WordPress {
 	static async updateSiteUrl(config) {
