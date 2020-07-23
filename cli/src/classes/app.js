@@ -251,7 +251,7 @@ class App {
 
 		await WordPress.updateSiteUrl(config);
 
-		spinner.succeed(`Environment resetted.`);
+		spinner.succeed(`Environment has been reset.`);
 	}
 
 	/**
@@ -377,37 +377,18 @@ class App {
 			}),
 		]);
 
-		spinner.text = 'Updating WordPress default url...';
-
-		// Update site url from localhost to default domain.
-		await WordPress.updateSiteUrl(config);
-
-		spinner.text = 'Creating new WordPress administrator...';
-
-		// Remove default admin password and create new administrator user.
-		config.userName = generate({
-			length: 8,
-			lowercase: true,
+		// Configure WordPress credentials.
+		const credentials = await WordPress.configureWordPressInstance({
+			config,
+			spinner,
 		});
-		config.userEmail = `${config.userName}@wpenvbox.com`;
-		config.userPass = generate({
-			length: 16,
-			numbers: true,
-			lowercase: true,
-			uppercase: true,
-		});
-		await WordPress.changeDefaultAdminUser(config);
 
-		spinner.info(
-			`Credentials:\nSite Url: https://${config.host}\nusername:${config.userName}\npassword:${config.userPass}\n`,
-		);
-		spinner.start();
+		spinner.text = `Getting Code Server access.`;
 
-		spinner.text = `Code Server access.`;
+		credentials.codeServerUrl = `https://${config.host}:8888`;
+		credentials.codeServerPassword = await CodeServer.getPassword(config);
 
-		const password = await CodeServer.getPassword(config);
-
-		spinner.info(`Code Server Url: https://${config.host}:8888\npassword:${password}\n`);
+		spinner.info(credentials);
 		spinner.start();
 
 		spinner.text = `Done!`;

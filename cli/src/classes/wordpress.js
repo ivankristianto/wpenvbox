@@ -1,6 +1,38 @@
 import { run } from 'docker-compose';
+import { generate } from 'generate-password';
 
 class WordPress {
+	static async configureWordPressInstance({ config, spinner }) {
+		spinner.text = 'Updating WordPress default url...';
+
+		// Update site url from localhost to default domain.
+		await WordPress.updateSiteUrl(config);
+
+		spinner.text = 'Creating new WordPress administrator...';
+
+		// Remove default admin password and create new administrator user.
+		config.userName = generate({
+			length: 8,
+			lowercase: true,
+		});
+		const domain = process.env.DOMAIN === 'localhost' ? 'wpenvbox.com' : process.env.DOMAIN;
+		config.userEmail = `${config.userName}@${domain}`;
+		config.userPass = generate({
+			length: 16,
+			numbers: true,
+			lowercase: true,
+			uppercase: true,
+		});
+		await WordPress.changeDefaultAdminUser(config);
+
+		return {
+			siteUrl: `https://${config.host}`,
+			userName: config.userName,
+			userEmail: config.userEmail,
+			userPass: config.userPass,
+		};
+	}
+
 	static async updateSiteUrl(config) {
 		const options = {
 			config: config.dockerComposeConfigPath,
