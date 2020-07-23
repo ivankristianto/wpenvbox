@@ -1,5 +1,5 @@
 import util from 'util';
-import crypto from 'crypto';
+import { generate } from 'generate-password';
 import fs from 'fs-extra';
 import path from 'path';
 import inquirer from 'inquirer';
@@ -17,6 +17,7 @@ import {
 import buildDockerComposeConfig from '@wordpress/env/lib/build-docker-compose-config';
 import yaml from 'js-yaml';
 import WordPress from './wordpress';
+import CodeServer from './code-server';
 
 /**
  * Promisified dependencies
@@ -26,41 +27,6 @@ const rimraf = util.promisify(require('rimraf'));
 const exec = util.promisify(require('child_process').exec);
 
 class App {
-	/**
-	 * Reset wpenvbox application services to clean state
-	 *
-	 * @param {object}  options Options object
-	 * @param {object}  options.spinner A CLI spinner which indicates progress.
-	 * @param {boolean} options.debug   True if debug mode is enabled.
-	 * @returns {Promise<object>}
-	 */
-	static async clean({ spinner, debug }) {
-		const config = await App.parseConfig({ spinner, debug });
-
-		spinner.text = `Cleaning started...`;
-
-		const tasks = [];
-
-		// Start the database first to avoid race conditions where all tasks create
-		// different docker networks with the same name.
-		await upOne('mysql', {
-			config: config.dockerComposeConfigPath,
-			log: config.debug,
-		});
-
-		tasks.push(
-			resetDatabase('development', config)
-				.then(() => configureWordPress('development', config))
-				.catch(() => {}),
-		);
-
-		await Promise.all(tasks);
-
-		await WordPress.updateSiteUrl(config);
-
-		spinner.succeed(`Environment cleaned.`);
-	}
-
 	/**
 	 * Create docker-compose.yml file
 	 *
@@ -80,7 +46,12 @@ class App {
 		// Add networks: proxy
 		dockerComposeConfig.networks = { proxy: { external: { name: 'proxy' } } };
 
-		const randomPassword = crypto.randomBytes(16).toString('hex');
+		const randomPassword = generate({
+			length: 16,
+			numbers: true,
+			lowercase: true,
+			uppercase: true,
+		});
 
 		// Modified mysql configurations.
 		dockerComposeConfig.services.mysql.environment = {
@@ -249,6 +220,41 @@ class App {
 	}
 
 	/**
+	 * Reset wpenvbox application services to clean state
+	 *
+	 * @param {object}  options Options object
+	 * @param {object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean} options.debug   True if debug mode is enabled.
+	 * @returns {Promise<object>}
+	 */
+	static async reset({ spinner, debug }) {
+		const config = await App.parseConfig({ spinner, debug });
+
+		spinner.text = `Resetting started...`;
+
+		const tasks = [];
+
+		// Start the database first to avoid race conditions where all tasks create
+		// different docker networks with the same name.
+		await upOne('mysql', {
+			config: config.dockerComposeConfigPath,
+			log: config.debug,
+		});
+
+		tasks.push(
+			resetDatabase('development', config)
+				.then(() => configureWordPress('development', config))
+				.catch(() => {}),
+		);
+
+		await Promise.all(tasks);
+
+		await WordPress.updateSiteUrl(config);
+
+		spinner.succeed(`Environment resetted.`);
+	}
+
+	/**
 	 * Start the wpenvbox application services
 	 *
 	 * @param {object}  options Options object
@@ -373,9 +379,38 @@ class App {
 
 		spinner.text = 'Updating WordPress default url...';
 
+		// Update site url from localhost to default domain.
 		await WordPress.updateSiteUrl(config);
 
-		spinner.text = `WordPress started.`;
+		spinner.text = 'Creating new WordPress administrator...';
+
+		// Remove default admin password and create new administrator user.
+		config.userName = generate({
+			length: 8,
+			lowercase: true,
+		});
+		config.userEmail = `${config.userName}@wpenvbox.com`;
+		config.userPass = generate({
+			length: 16,
+			numbers: true,
+			lowercase: true,
+			uppercase: true,
+		});
+		await WordPress.changeDefaultAdminUser(config);
+
+		spinner.info(
+			`Credentials:\nSite Url: https://${config.host}\nusername:${config.userName}\npassword:${config.userPass}\n`,
+		);
+		spinner.start();
+
+		spinner.text = `Code Server access.`;
+
+		const password = await CodeServer.getPassword(config);
+
+		spinner.info(`Code Server Url: https://${config.host}:8888\npassword:${password}\n`);
+		spinner.start();
+
+		spinner.text = `Done!`;
 	}
 
 	/**

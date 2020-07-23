@@ -1,7 +1,7 @@
 import App from '../../classes/app';
 import withSpinner from '../../utils/withSpinner';
 
-exports.command = 'stop';
-exports.desc = 'Stop wp-env box services';
+exports.command = 'reset';
+exports.desc = 'Reset wp-env box data';
 exports.builder = {};
-exports.handler = withSpinner(App.stop);
+exports.handler = withSpinner(App.reset);

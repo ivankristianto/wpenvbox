@@ -3,11 +3,5 @@ import withSpinner from '../../utils/withSpinner';
 
 exports.command = 'start';
 exports.desc = 'Start wp-env box services';
-exports.builder = {
-	debug: {
-		default: true,
-		describe: 'Show debug process',
-		type: 'boolean',
-	},
-};
+exports.builder = {};
 exports.handler = withSpinner(App.start);

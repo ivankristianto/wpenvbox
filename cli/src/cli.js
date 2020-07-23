@@ -13,6 +13,11 @@ function main() {
 			.commandDir('commands')
 			.demandCommand()
 			.help()
+			.option('debug', {
+				description: 'Enable debug messages',
+				default: false,
+				type: 'boolean',
+			})
 			.wrap(Math.min(120, yargs.terminalWidth())).argv;
 	} catch (e) {
 		log.error(e.toString());
