@@ -23,6 +23,13 @@
     "cli",
     "wordpress"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:ivankristianto/wpenvbox.git"
+  },
+  "bugs": {
+    "url": "https://github.com/ivankristianto/wpenvbox/issues"
+  },
   "author": "Ivan Kristianto",
   "license": "MIT",
   "dependencies": {
