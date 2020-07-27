@@ -25,6 +25,10 @@ class Config {
 		return path.join(os.homedir(), '.wpenvbox/proxy');
 	}
 
+	static getAppPath() {
+		return path.join(os.homedir(), '.wpenvbox/app');
+	}
+
 	static getProxyGit() {
 		return 'https://github.com/ivankristianto/wpenvbox-proxy.git';
 	}

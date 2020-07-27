@@ -1,9 +1,14 @@
+// External libs.
 import util from 'util';
-import { generate } from 'generate-password';
-import fs from 'fs-extra';
+import crypto from 'crypto';
 import path from 'path';
+import fs from 'fs-extra';
 import inquirer from 'inquirer';
+import { generate } from 'generate-password';
 import { upOne, upMany, down, rm, run } from 'docker-compose';
+import yaml from 'js-yaml';
+
+// Imports from @wordpress/env.
 import { readConfig } from '@wordpress/env/lib/config';
 import retry from '@wordpress/env/lib/retry';
 import downloadSource from '@wordpress/env/lib/download-source';
@@ -15,10 +20,12 @@ import {
 	resetDatabase,
 } from '@wordpress/env/lib/wordpress';
 import buildDockerComposeConfig from '@wordpress/env/lib/build-docker-compose-config';
-import yaml from 'js-yaml';
-import WordPress from './wordpress';
+
+// Internal lib.
 import CodeServer from './code-server';
+import Config from './config';
 import formatter from '../utils/formatter';
+import WordPress from './wordpress';
 
 /**
  * Promisified dependencies
@@ -226,6 +233,14 @@ class App {
 		const config = await readConfig(configPath);
 		config.debug = debug;
 		config.port = process.env.WPENVPORT;
+		config.workDirectoryPath = path.resolve(
+			Config.getAppPath(),
+			crypto.createHash('md5').update(configPath).digest('hex'),
+		);
+		config.dockerComposeConfigPath = path.resolve(
+			config.workDirectoryPath,
+			'docker-compose.yml',
+		);
 		config.basename = config.workDirectoryPath.split('/').pop();
 		config.host = `${config.basename}.${process.env.DOMAIN}`;
 
