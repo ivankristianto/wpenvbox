@@ -3,7 +3,7 @@ import { generate } from 'generate-password';
 import fs from 'fs-extra';
 import path from 'path';
 import inquirer from 'inquirer';
-import { upOne, upAll, down, rm, run } from 'docker-compose';
+import { upOne, upMany, down, rm, run } from 'docker-compose';
 import { readConfig } from '@wordpress/env/lib/config';
 import retry from '@wordpress/env/lib/retry';
 import downloadSource from '@wordpress/env/lib/download-source';
@@ -18,6 +18,7 @@ import buildDockerComposeConfig from '@wordpress/env/lib/build-docker-compose-co
 import yaml from 'js-yaml';
 import WordPress from './wordpress';
 import CodeServer from './code-server';
+import formatter from '../utils/formatter';
 
 /**
  * Promisified dependencies
@@ -60,7 +61,7 @@ class App {
 			MYSQL_DATABASE: 'wordpress',
 			MYSQL_USER: 'wordpress',
 			MYSQL_PASSWORD: randomPassword,
-			MYSQL_RANDOM_ROOT_PASSWORD: '1',
+			MYSQL_ALLOW_EMPTY_PASSWORD: 'yes',
 		};
 		dockerComposeConfig.services.mysql.command = '--innodb-use-native-aio=0';
 		dockerComposeConfig.services.mysql.labels = [`traefik.enable=false`];
@@ -84,6 +85,14 @@ class App {
 			`traefik.http.routers.${config.basename}-secure.tls.certresolver=letsencrypt`,
 		];
 		delete dockerComposeConfig.services.wordpress.ports;
+
+		// Modified tests-wordpress configurations.
+		dockerComposeConfig.services['tests-wordpress'].environment = {
+			WORDPRESS_DB_HOST: 'mysql',
+			WORDPRESS_DB_USER: 'wordpress',
+			WORDPRESS_DB_PASSWORD: randomPassword,
+			WORDPRESS_DB_NAME: 'tests-wordpress',
+		};
 
 		if (!disableCodeserver) {
 			// Add code server
@@ -351,14 +360,25 @@ class App {
 
 		spinner.text = 'Starting WordPress.';
 
-		await upAll({
+		// @TODO: Add sanity check if codeserver and tests-wordpress service exist of not.
+		const services = [
+			'wordpress',
+			'codeserver',
+			// 'tests-wordpress'
+		];
+		await upMany(services, {
 			config: config.dockerComposeConfigPath,
 			log: config.debug,
 		});
 
 		if (config.coreSource === null) {
+			const promises = [
+				makeContentDirectoriesWritable('development', config),
+				// @TODO: Work on the tests.
+				// makeContentDirectoriesWritable('tests', config),
+			];
 			// Don't chown wp-content when it exists on the user's local filesystem.
-			await Promise.all([makeContentDirectoriesWritable('development', config)]);
+			await Promise.all(promises);
 		}
 
 		try {
@@ -375,11 +395,13 @@ class App {
 		}
 
 		// Retry WordPress installation in case MySQL *still* wasn't ready.
-		await Promise.all([
+		const actions = [
 			retry(() => configureWordPress('development', config), {
 				times: 2,
 			}),
-		]);
+			// retry(() => configureWordPress('tests', config), { times: 2 }),
+		];
+		await Promise.all(actions);
 
 		// Configure WordPress credentials.
 		const credentials = await WordPress.configureWordPressInstance({
@@ -392,7 +414,10 @@ class App {
 		credentials.codeServerUrl = `https://${config.host}:8888`;
 		credentials.codeServerPassword = await CodeServer.getPassword(config);
 
-		spinner.info(credentials);
+		spinner.info('Access to services:');
+		const fields = 'siteUrl,userName,userEmail,userPass,codeServerUrl,codeServerPassword';
+		const results = formatter.mappingField(fields, credentials);
+		formatter.toList(fields, results);
 		spinner.start();
 
 		spinner.text = `Done!`;
