@@ -31,11 +31,12 @@ class App {
 	 * Create docker-compose.yml file
 	 *
 	 * @param {object}  options Options object
-	 * @param {object}  options.spinner A CLI spinner which indicates progress.
+	 * @param {boolean} options.codeserver  True if code server is enabled.
 	 * @param {boolean} options.debug   True if debug mode is enabled.
+	 * @param {object}  options.spinner A CLI spinner which indicates progress.
 	 * @returns {Promise<object>}
 	 */
-	static async create({ spinner, debug }) {
+	static async create({ codeserver, debug, spinner }) {
 		const config = await App.parseConfig({ spinner, debug });
 
 		spinner.text = `Creating ${config.workDirectoryPath} directory.`;
@@ -83,29 +84,23 @@ class App {
 		];
 		delete dockerComposeConfig.services.wordpress.ports;
 
-		// Add code server
-		dockerComposeConfig.services.codeserver = {
-			depends_on: ['wordpress'],
-			image: 'ivankristianto/code-server:latest',
-			labels: [
-				`traefik.http.routers.${config.basename}-code-secure.entrypoints=codeserver`,
-				`traefik.http.routers.${config.basename}-code-secure.rule=Host(\`${config.host}\`)`,
-				`traefik.http.routers.${config.basename}-code-secure.tls=true`,
-				`traefik.http.routers.${config.basename}-code-secure.tls.certresolver=letsencrypt`,
-			],
-			volumes: dockerComposeConfig.services.wordpress.volumes.map((volume) =>
-				volume.replace('/var/www/html', '/home/coder/project'),
-			),
-			networks: ['proxy', 'default'],
-		};
-
-		// @TODO: Revisit this later
-		// For now removing things we don't need
-		delete dockerComposeConfig.services.phpunit;
-		delete dockerComposeConfig.services['tests-cli'];
-		delete dockerComposeConfig.services['tests-wordpress'];
-		delete dockerComposeConfig.volumes['tests-wordpress'];
-		delete dockerComposeConfig.volumes['phpunit-uploads'];
+		if (codeserver) {
+			// Add code server
+			dockerComposeConfig.services.codeserver = {
+				depends_on: ['wordpress'],
+				image: 'ivankristianto/code-server:latest',
+				labels: [
+					`traefik.http.routers.${config.basename}-code-secure.entrypoints=codeserver`,
+					`traefik.http.routers.${config.basename}-code-secure.rule=Host(\`${config.host}\`)`,
+					`traefik.http.routers.${config.basename}-code-secure.tls=true`,
+					`traefik.http.routers.${config.basename}-code-secure.tls.certresolver=letsencrypt`,
+				],
+				volumes: dockerComposeConfig.services.wordpress.volumes.map((volume) =>
+					volume.replace('/var/www/html', '/home/coder/project'),
+				),
+				networks: ['proxy', 'default'],
+			};
+		}
 
 		await fs.writeFile(config.dockerComposeConfigPath, yaml.dump(dockerComposeConfig));
 
