@@ -1,10 +1,13 @@
-# WPEnvBox CLI Interface with Node.js
+# WPEnvBox
 
-> This package allows you to manage your Cloudflare Accounts through cli interface.
+> Manage @wordpress/env stack with automatic traffic routing.
+
+**This package is still under development**
 
 ## Requirements
 
 * Node.js 10 or above
+* Docker
 
 ## Install
 
