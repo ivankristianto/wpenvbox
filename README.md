@@ -4,7 +4,7 @@
 
 ## How To Start
 
-For setting up docker please follow Docker Installation guide.
+For setting up docker please follow [prerequisites Installation](https://github.com/ivankristianto/wpenvbox/blob/master/INSTALLATION.md) guide.
 
 1. Install WPEnvBox cli package: `npm install -g wpenvbox`
 2. Run `wpenvbox init`
