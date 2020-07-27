@@ -4,9 +4,14 @@ import withSpinner from '../../utils/withSpinner';
 exports.command = 'create';
 exports.desc = 'Create new wp-env box';
 exports.builder = {
-	codeserver: {
-		default: true,
+	disableCodeserver: {
+		default: false,
 		describe: 'Enable/Disable code server',
+		type: 'boolean',
+	},
+	disableTest: {
+		default: true,
+		describe: 'Enable/Disable tests environment',
 		type: 'boolean',
 	},
 };

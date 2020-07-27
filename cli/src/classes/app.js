@@ -31,12 +31,13 @@ class App {
 	 * Create docker-compose.yml file
 	 *
 	 * @param {object}  options Options object
-	 * @param {boolean} options.codeserver  True if code server is enabled.
 	 * @param {boolean} options.debug   True if debug mode is enabled.
+	 * @param {boolean} options.disableCodeserver  True if code server is disabled.
+	 * @param {boolean} options.disableTest  True if tests environment is disabled.
 	 * @param {object}  options.spinner A CLI spinner which indicates progress.
 	 * @returns {Promise<object>}
 	 */
-	static async create({ codeserver, debug, spinner }) {
+	static async create({ debug, disableCodeserver, disableTest, spinner }) {
 		const config = await App.parseConfig({ spinner, debug });
 
 		spinner.text = `Creating ${config.workDirectoryPath} directory.`;
@@ -84,7 +85,7 @@ class App {
 		];
 		delete dockerComposeConfig.services.wordpress.ports;
 
-		if (codeserver) {
+		if (!disableCodeserver) {
 			// Add code server
 			dockerComposeConfig.services.codeserver = {
 				depends_on: ['wordpress'],
@@ -100,6 +101,14 @@ class App {
 				),
 				networks: ['proxy', 'default'],
 			};
+		}
+
+		if (disableTest) {
+			delete dockerComposeConfig.services.phpunit;
+			delete dockerComposeConfig.services['tests-cli'];
+			delete dockerComposeConfig.services['tests-wordpress'];
+			delete dockerComposeConfig.volumes['tests-wordpress'];
+			delete dockerComposeConfig.volumes['phpunit-uploads'];
 		}
 
 		await fs.writeFile(config.dockerComposeConfigPath, yaml.dump(dockerComposeConfig));
